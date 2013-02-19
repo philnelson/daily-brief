@@ -64,7 +64,7 @@ def fetch_headlines():
     text.append(u"Here are this morning\'s headlines:\r\n\r\n")
     ss = summarize.SimpleSummarizer()
     for entry in headlines.entries[0:7]:
-        text.append(u''.join(entry.title + "\r\n"))
+        text.append(u''.join(entry.title + ":\r\n"))
         summary = ss.summarize(entry.summary.encode('utf-8'), 2)
         text.append(u''.join([summary.decode('utf-8'), "\r\n"]))
         text.append("\r\n\r\n")
