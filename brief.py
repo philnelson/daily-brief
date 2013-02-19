@@ -61,14 +61,15 @@ def fetch_weather():
 def fetch_headlines():
     headlines = feedparser.parse(CONFIG['feeds']['headlines'])
     text = []
-    text.append(u"Here are this morning\'s headlines:\r\n")
+    text.append(u"Here are this morning\'s headlines:\r\n\r\n")
     ss = summarize.SimpleSummarizer()
     for entry in headlines.entries[0:7]:
         text.append(u''.join(entry.title + "\r\n"))
         summary = ss.summarize(entry.summary.encode('utf-8'), 2)
-        text.append(u''.join(summary.decode('utf-8')))
-        #text.append("\n")
-        text.append(u"[[slnc 400]]\r\n")
+        text.append(u''.join([summary.decode('utf-8'), "\r\n"]))
+        text.append("[[slnc 400]]\r\n")
+        # "Use Embedded Speech Commands to Fine-Tune Spoken Output"
+        #text.append(u"[[slnc 400]]\r\n")
     return text
 
 
@@ -105,7 +106,7 @@ if __name__ == "__main__":
     CONFIG = load_config()
     
     msg_text = []
-    msg_text.append(u"Good %s, %s. It is %s.\r\n" % (greeting(), CONFIG['name'], fetch_weather()))
+    msg_text.append(u"Good %s, %s. It is %s.\r\n\r\n" % (greeting(), CONFIG['name'], fetch_weather()))
     
     msg_text.extend(fetch_headlines())
     
