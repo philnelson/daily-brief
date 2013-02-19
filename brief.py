@@ -69,8 +69,8 @@ def fetch_headlines():
             if entry.title.startswith(skip):
                 continue
             text.append(u''.join(entry.title + ":\r\n"))
-            title_lower = entry.title.decode('utf-8').lower()
-            summary_lower = entry.summary.decode('utf-8').lower()
+            title_lower = entry.title.lower()
+            summary_lower = entry.summary.lower()
             if title_lower != summary_lower:
                 summary = ss.summarize(entry.summary.encode('utf-8'), 2)
                 text.append(u''.join([summary.decode('utf-8'), "\r\n"]))
@@ -116,7 +116,6 @@ if __name__ == "__main__":
     msg_text.append(u"Good %s, %s. It is %s.\r\n\r\n" % (greeting(), CONFIG['name'], fetch_weather()))
     
     msg_text.extend(fetch_headlines())
-    print msg_text
     msg = prepare_msg(msg_text)
     email = prepare_email(msg, 'Daily Briefing', CONFIG['from'], CONFIG['to'])
     
