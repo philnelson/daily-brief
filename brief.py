@@ -121,7 +121,7 @@ if __name__ == "__main__":
     
     if args.to_text:
         for msg in msg_text:
-            print msg
+            sys.stdout.write(msg.encode('utf-8'))
     else:
         try:
             email = prepare_email(msg, 'Daily Briefing', CONFIG['from'], CONFIG['to'])
