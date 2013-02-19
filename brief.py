@@ -46,12 +46,12 @@ def load_config():
 
 def greeting():
     morning = 12
-    afternoon = 15
+    afternoon = 18
     evening = 24
-    current_hour = time.strftime("%H", NOW)
+    current_hour = int(time.strftime("%H", NOW))
     if current_hour < morning:
         return "morning"
-    elif current_hour > morning and current_hour < afternoon:
+    elif morning <= current_hour < afternoon:
         return "afternoon"
     else:
         return "evening"
@@ -72,10 +72,10 @@ def fetch_weather():
     return short_forecast
 
 
-def fetch_headlines():
+def fetch_headlines(greeting):
     headlines = feedparser.parse(CONFIG['feeds']['headlines'])
     text = []
-    text.append(u"Here are this morning\'s headlines:\r\n\r\n")
+    text.append(u"Here are this %s\'s headlines:\r\n\r\n" % (greeting))
     ss = summarize.SimpleSummarizer()
     stories_to_skip = ['Review: ']
     for entry in headlines.entries:
@@ -127,11 +127,12 @@ if __name__ == "__main__":
         sys.exit()
     
     CONFIG = load_config()
-
-    msg_text = []
-    msg_text.append(u"Good %s, %s. It is %s.\r\n\r\n" % (greeting(), CONFIG['name'], fetch_weather()))
     
-    msg_text.extend(fetch_headlines())
+    greeting = greeting()
+    msg_text = []
+    msg_text.append(u"Good %s, %s. It is %s.\r\n\r\n" % (greeting, CONFIG['name'], fetch_weather()))
+    
+    msg_text.extend(fetch_headlines(greeting))
     msg = prepare_msg(msg_text)
     
     if args.to_text:
