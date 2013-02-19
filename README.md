@@ -11,7 +11,7 @@ I always recommend using virtualenv and virtualenvwrapper and so I've only done 
 following inside a virtualenv.
 
 1. `pip install -r requirements.txt` (installs feedparser, nltk and their dependencies.)
-2. run `./brief.py --nltk_first_run` to install the necessary nltk corpora and tokenizers
+2. run `./brief.py --nltk-first-run` to install the necessary nltk corpora and tokenizers
 (used for the summarization feature)
 3. create a file called brief.config that will hold the configuration values in a 
 JSON format.
@@ -36,8 +36,13 @@ Here's a sample of what the contents should look like:
 }
 </pre>
 
+(It should be noted that the script is over-optimized for weather.gov and npr.org feeds.)
+
 Running
 -------
+
+If you'd like to see what the output will look like or want to pipe the output somewhere 
+else use the `--to-text` flag.
 
 Presumbly you'll want to have a cron job send this every morning:
 

@@ -102,7 +102,8 @@ def send_email(email, host):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--nltk_first_run", help="download NLTK corpora", action='store_true')
+    parser.add_argument("--to-text", help="output to stdout instead of sending an email", action='store_true')
+    parser.add_argument("--nltk-first-run", help="download NLTK corpora", action='store_true')
     args = parser.parse_args()
     
     # just install the nltk junk
@@ -111,18 +112,22 @@ if __name__ == "__main__":
         sys.exit()
     
     CONFIG = load_config()
-    
+
     msg_text = []
     msg_text.append(u"Good %s, %s. It is %s.\r\n\r\n" % (greeting(), CONFIG['name'], fetch_weather()))
     
     msg_text.extend(fetch_headlines())
     msg = prepare_msg(msg_text)
-    email = prepare_email(msg, 'Daily Briefing', CONFIG['from'], CONFIG['to'])
     
-    try:
-        #send_email(email, CONFIG['smtp']['host'])
-        #print "Email sent"
-        print ""
-    except SMTPException:
-        #print "Error: unable to send email"
-        print ""
+    if args.to_text:
+        for msg in msg_text:
+            print msg
+    else:
+        try:
+            email = prepare_email(msg, 'Daily Briefing', CONFIG['from'], CONFIG['to'])
+            send_email(email, CONFIG['smtp']['host'])
+            #print "Email sent"
+            print ""
+        except SMTPException:
+            #print "Error: unable to send email"
+            print ""
