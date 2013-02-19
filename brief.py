@@ -73,7 +73,6 @@ def fetch_headlines():
 
 
 def prepare_msg(msg_text):
-    print msg_text
     text = u''.join(msg_text)
     return MIMEText(text.encode('utf-8'), 'plain', 'utf-8')
 
