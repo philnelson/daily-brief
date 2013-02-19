@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import sys
 import codecs
 import json
@@ -20,6 +21,7 @@ __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file
 CONFIG = None
 NOW = time.localtime()
 
+
 def greeting():
     morning = 12
     afternoon = 15
@@ -32,25 +34,29 @@ def greeting():
     else:
         return "evening"
 
+
 def nltk_prep():
     import nltk
     nltk.download('stopwords')
     nltk.download('punkt')
 
+
 def load_config():
-    config_file=open(os.path.join(__location__, 'brief.config'))
+    config_file = open(os.path.join(__location__, 'brief.config'))
     config = json.load(config_file)
     config_file.close()
     return config
 
+
 def fetch_weather():
     weather_report = feedparser.parse(CONFIG['feeds']['weather'])
     long_forecast = weather_report.entries[0].title.encode('utf-8')
-    short_forecast = long_forecast.split(' at ',1)[0]
+    short_forecast = long_forecast.split(' at ', 1)[0]
     # the NWS forecast gives you a temp like 43 F and OS X/iOS reads it daftly.
-    short_forecast = re.sub(r'^(.*)\s([+-]?[0-9]+)\s?([CF])$',r'\1 \2 degrees',short_forecast)
+    short_forecast = re.sub(r'^(.*)\s([+-]?[0-9]+)\s?([CF])$', r'\1 \2 degrees', short_forecast)
     return short_forecast
-    
+
+
 def fetch_headlines():
     headlines = feedparser.parse(CONFIG['feeds']['headlines'])
     text = []
@@ -61,17 +67,20 @@ def fetch_headlines():
         text.append(ss.summarize(entry.summary.encode('utf-8'), 2))
         #text.append("\n")
         text.append("[[slnc 400]] \n")
-    return text 
+    return text
+
 
 def prepare_msg(msg_text):
     text = ''.join(msg_text)
     return MIMEText(text.decode('utf-8'), _charset='utf-8')
+
 
 def prepare_email(msg, subject, from_addr, to_addr):
     msg['Subject'] = subject
     msg['From'] = from_addr
     msg['To'] = to_addr
     return msg
+
 
 def send_email(email, host):
     # Send the message via our own SMTP server, but don't include the
@@ -80,10 +89,11 @@ def send_email(email, host):
     s.sendmail(email['From'], email['To'], email.as_string())
     s.quit()
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--nltk_first_run", help="download NLTK corpora", action='store_true')
-    args = parser.parse_args()  
+    args = parser.parse_args()
     
     # just install the nltk junk
     if args.nltk_first_run:
@@ -99,7 +109,7 @@ if __name__ == "__main__":
     
     print msg_text
     
-    msg = prepare_msg(msg_text)    
+    msg = prepare_msg(msg_text)
     email = prepare_email(msg, 'Daily Briefing', CONFIG['from'], CONFIG['to'])
     
     try:
@@ -109,4 +119,3 @@ if __name__ == "__main__":
     except SMTPException:
         #print "Error: unable to send email"
         print ""
-        
