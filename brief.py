@@ -105,7 +105,7 @@ if __name__ == "__main__":
     msg_text = []
     msg_text.append("Good %s, %s. It is %s.\n" % (greeting(), CONFIG['name'], fetch_weather()))
     
-    msg_text.extend(fetch_npr_headlines())
+    msg_text.extend(fetch_headlines())
     
     print msg_text
     
