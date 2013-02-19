@@ -12,15 +12,36 @@ import summarize
 import argparse
 import time
 import re
-
 from pprint import pprint
-
-# Import the email modules we'll need
 from email.mime.text import MIMEText
+from HTMLParser import HTMLParser
+
 
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 CONFIG = None
 NOW = time.localtime()
+
+
+class MLStripper(HTMLParser):
+    def __init__(self):
+        self.reset()
+        self.fed = []
+    def handle_data(self, d):
+        self.fed.append(d)
+    def get_data(self):
+        return ''.join(self.fed)
+
+def strip_tags(html):
+    s = MLStripper()
+    s.feed(html)
+    return s.get_data()
+
+
+def load_config():
+    config_file = open(os.path.join(__location__, 'brief.config'))
+    config = json.load(config_file)
+    config_file.close()
+    return config
 
 
 def greeting():
@@ -40,13 +61,6 @@ def nltk_prep():
     import nltk
     nltk.download('stopwords')
     nltk.download('punkt')
-
-
-def load_config():
-    config_file = open(os.path.join(__location__, 'brief.config'))
-    config = json.load(config_file)
-    config_file.close()
-    return config
 
 
 def fetch_weather():
@@ -72,7 +86,8 @@ def fetch_headlines():
             title_lower = entry.title.lower()
             summary_lower = entry.summary.lower()
             if title_lower != summary_lower:
-                summary = ss.summarize(entry.summary.encode('utf-8'), 2)
+                summary = strip_tags(entry.summary)
+                summary = ss.summarize(summary.encode('utf-8'), 2)
                 text.append(u''.join([summary.decode('utf-8'), "\r\n"]))
                 text.append("\r\n\r\n")
             # "Use Embedded Speech Commands to Fine-Tune Spoken Output"
