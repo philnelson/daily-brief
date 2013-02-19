@@ -63,13 +63,20 @@ def fetch_headlines():
     text = []
     text.append(u"Here are this morning\'s headlines:\r\n\r\n")
     ss = summarize.SimpleSummarizer()
-    for entry in headlines.entries[0:7]:
-        text.append(u''.join(entry.title + ":\r\n"))
-        summary = ss.summarize(entry.summary.encode('utf-8'), 2)
-        text.append(u''.join([summary.decode('utf-8'), "\r\n"]))
-        text.append("\r\n\r\n")
-        # "Use Embedded Speech Commands to Fine-Tune Spoken Output"
-        #text.append(u"[[slnc 400]]\r\n")
+    stories_to_skip = ['Review: ']
+    for entry in headlines.entries:
+        for skip in stories_to_skip:
+            if entry.title.startswith(skip):
+                continue
+            text.append(u''.join(entry.title + ":\r\n"))
+            title_lower = entry.title.decode('utf-8').lower()
+            summary_lower = entry.summary.decode('utf-8').lower()
+            if title_lower != summary_lower:
+                summary = ss.summarize(entry.summary.encode('utf-8'), 2)
+                text.append(u''.join([summary.decode('utf-8'), "\r\n"]))
+                text.append("\r\n\r\n")
+            # "Use Embedded Speech Commands to Fine-Tune Spoken Output"
+            #text.append(u"[[slnc 400]]\r\n")
     return text
 
 
@@ -109,12 +116,12 @@ if __name__ == "__main__":
     msg_text.append(u"Good %s, %s. It is %s.\r\n\r\n" % (greeting(), CONFIG['name'], fetch_weather()))
     
     msg_text.extend(fetch_headlines())
-    
+    print msg_text
     msg = prepare_msg(msg_text)
     email = prepare_email(msg, 'Daily Briefing', CONFIG['from'], CONFIG['to'])
     
     try:
-        send_email(email, CONFIG['smtp']['host'])
+        #send_email(email, CONFIG['smtp']['host'])
         #print "Email sent"
         print ""
     except SMTPException:
