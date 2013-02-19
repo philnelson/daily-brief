@@ -67,7 +67,7 @@ def fetch_headlines():
         text.append(u''.join(entry.title + "\r\n"))
         summary = ss.summarize(entry.summary.encode('utf-8'), 2)
         text.append(u''.join([summary.decode('utf-8'), "\r\n"]))
-        text.append("[[slnc 400]]\r\n")
+        text.append("\r\n\r\n")
         # "Use Embedded Speech Commands to Fine-Tune Spoken Output"
         #text.append(u"[[slnc 400]]\r\n")
     return text
