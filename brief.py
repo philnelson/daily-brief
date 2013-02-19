@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import sys
 import codecs
 import json
 import smtplib
@@ -15,6 +16,7 @@ from pprint import pprint
 # Import the email modules we'll need
 from email.mime.text import MIMEText
 
+__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 CONFIG = None
 NOW = time.localtime()
 
@@ -36,7 +38,7 @@ def nltk_prep():
     nltk.download('punkt')
 
 def load_config():
-    config_file=open('brief.config')
+    config_file=open(os.path.join(__location__, 'brief.config'))
     config = json.load(config_file)
     config_file.close()
     return config
@@ -49,10 +51,10 @@ def fetch_weather():
     short_forecast = re.sub(r'^(.*)\s([+-]?[0-9]+)\s?([CF])$',r'\1 \2 degrees',short_forecast)
     return short_forecast
     
-def fetch_npr_headlines():
-    headlines = feedparser.parse(CONFIG['feeds']['npr'])
+def fetch_headlines():
+    headlines = feedparser.parse(CONFIG['feeds']['headlines'])
     text = []
-    text.append("Here are this morning\'s headlines from NPR.\n")
+    text.append("Here are this morning\'s headlines:\n")
     ss = summarize.SimpleSummarizer()
     for entry in headlines.entries[0:7]:
         text.append(entry.title.encode('utf-8') + "\n")
@@ -83,8 +85,10 @@ if __name__ == "__main__":
     parser.add_argument("--nltk_first_run", help="download NLTK corpora", action='store_true')
     args = parser.parse_args()  
     
+    # just install the nltk junk
     if args.nltk_first_run:
         nltk_prep()
+        sys.exit()
     
     CONFIG = load_config()
     
