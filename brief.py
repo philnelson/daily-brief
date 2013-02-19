@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import os
 import sys
@@ -50,7 +51,7 @@ def load_config():
 
 def fetch_weather():
     weather_report = feedparser.parse(CONFIG['feeds']['weather'])
-    long_forecast = weather_report.entries[0].title.encode('utf-8')
+    long_forecast = weather_report.entries[0].title
     short_forecast = long_forecast.split(' at ', 1)[0]
     # the NWS forecast gives you a temp like 43 F and OS X/iOS reads it daftly.
     short_forecast = re.sub(r'^(.*)\s([+-]?[0-9]+)\s?([CF])$', r'\1 \2 degrees', short_forecast)
@@ -60,19 +61,21 @@ def fetch_weather():
 def fetch_headlines():
     headlines = feedparser.parse(CONFIG['feeds']['headlines'])
     text = []
-    text.append("Here are this morning\'s headlines:\n")
+    text.append(u"Here are this morning\'s headlines:\n")
     ss = summarize.SimpleSummarizer()
     for entry in headlines.entries[0:7]:
-        text.append(entry.title.encode('utf-8') + "\n")
-        text.append(ss.summarize(entry.summary.encode('utf-8'), 2))
+        text.append(u''.join(entry.title + "\n"))
+        summary = ss.summarize(entry.summary.encode('utf-8'), 2)
+        text.append(u''.join(summary.decode('utf-8')))
         #text.append("\n")
-        text.append("[[slnc 400]] \n")
+        text.append(u"[[slnc 400]] \n")
     return text
 
 
 def prepare_msg(msg_text):
-    text = ''.join(msg_text)
-    return MIMEText(text.decode('utf-8'), _charset='utf-8')
+    print msg_text
+    text = u''.join(msg_text)
+    return MIMEText(text.encode('utf-8'), 'plain', 'utf-8')
 
 
 def prepare_email(msg, subject, from_addr, to_addr):
@@ -103,11 +106,9 @@ if __name__ == "__main__":
     CONFIG = load_config()
     
     msg_text = []
-    msg_text.append("Good %s, %s. It is %s.\n" % (greeting(), CONFIG['name'], fetch_weather()))
+    msg_text.append(u"Good %s, %s. It is %s.\n" % (greeting(), CONFIG['name'], fetch_weather()))
     
     msg_text.extend(fetch_headlines())
-    
-    print msg_text
     
     msg = prepare_msg(msg_text)
     email = prepare_email(msg, 'Daily Briefing', CONFIG['from'], CONFIG['to'])
